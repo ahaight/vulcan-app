@@ -19,6 +19,9 @@ export class VulcanPage {
   readonly deleteModal: Locator;
   readonly deleteConfirmButton: Locator;
   readonly deleteCancelButton: Locator;
+  readonly formError: Locator;
+  readonly editError: Locator;
+  readonly todoItems: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -39,6 +42,9 @@ export class VulcanPage {
     this.deleteModal = page.locator("#delete-modal");
     this.deleteConfirmButton = page.locator("#delete-confirm-button");
     this.deleteCancelButton = page.locator("#delete-cancel-button");
+    this.formError = page.locator("#form-error");
+    this.editError = page.locator("#edit-error");
+    this.todoItems = page.locator(".todo-item");
   }
 
   async goto(): Promise<void> {
@@ -68,7 +74,7 @@ export class VulcanPage {
   async addTask(
     title: string,
     points: number,
-    status: "not started" | "in progress" | "done" = "not started",
+    status: "Not started" | "In progress" | "Done" = "Not started",
   ): Promise<void> {
     await this.titleInput.fill(title);
     await this.pointsInput.fill(String(points));
@@ -126,7 +132,10 @@ export class VulcanPage {
     await this.deleteCancelButton.click();
   }
 
-  async setTaskStatus(title: string, status: "not started" | "in progress" | "done"): Promise<void> {
+  async setTaskStatus(
+    title: string,
+    status: "Not started" | "In progress" | "Done",
+  ): Promise<void> {
     await this.todoItemByTitle(title).locator(".status-select").selectOption(status);
   }
 
@@ -141,5 +150,64 @@ export class VulcanPage {
 
   async goToToday(): Promise<void> {
     await this.todayButton.click();
+  }
+
+  async setFilter(
+    value: "all" | "Not started" | "In progress" | "Done",
+  ): Promise<void> {
+    await this.filterSelect.selectOption(value);
+  }
+
+  async setSort(
+    value:
+      | "created-desc"
+      | "created-asc"
+      | "points-desc"
+      | "status",
+  ): Promise<void> {
+    await this.sortSelect.selectOption(value);
+  }
+
+  async expectFormError(message: string): Promise<void> {
+    await expect(this.formError).toHaveText(message);
+  }
+
+  async expectEditError(message: string): Promise<void> {
+    await expect(this.editError).toHaveText(message);
+  }
+
+  async submitAddTaskForm(): Promise<void> {
+    await this.addTaskButton.click();
+  }
+
+  async expectTodoItemCount(count: number): Promise<void> {
+    await expect(this.todoItems).toHaveCount(count);
+  }
+
+  async firstTodoTitle(): Promise<string | null> {
+    const first = this.page.locator(".todo-item").first().locator(".todo-title");
+    return first.textContent();
+  }
+
+  async expectStatusForTask(
+    title: string,
+    status: "Not started" | "In progress" | "Done",
+  ): Promise<void> {
+    await expect(
+      this.todoItemByTitle(title).locator(".status-select"),
+    ).toHaveValue(status);
+  }
+
+  /** Sets points input value directly (for testing app validation; avoids browser number clamp). */
+  async setPointsInputValueRaw(value: string): Promise<void> {
+    await this.pointsInput.evaluate((el, v) => {
+      (el as HTMLInputElement).value = v;
+    }, value);
+  }
+
+  async setEditPointsInputValueRaw(value: string): Promise<void> {
+    await this.editPointsInput.evaluate((el, v) => {
+      (el as HTMLInputElement).value = v;
+    }, value);
   }
 }

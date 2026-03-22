@@ -1,40 +1,30 @@
-import { test } from "@playwright/test";
-import { VulcanPage } from "./pages/vulcan-page";
+import { test } from "./fixtures";
 
-test.beforeEach(async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-  await vulcan.setupFreshState();
-});
-
-test.afterEach(async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-  await vulcan.cleanupData();
-});
-
-test("keeps tasks isolated by date and persists on reload", async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-
+test("keeps tasks isolated by date and persists on reload", async ({
+  vulcanPage,
+  page,
+}) => {
   const todayTask = `Today task ${Date.now()}`;
-  await vulcan.addTask(todayTask, 3);
-  await vulcan.expectTaskVisible(todayTask);
+  await vulcanPage.addTask(todayTask, 3);
+  await vulcanPage.expectTaskVisible(todayTask);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowKey = tomorrow.toISOString().slice(0, 10);
 
-  await vulcan.setDate(tomorrowKey);
-  await vulcan.expectTaskNotVisible(todayTask);
+  await vulcanPage.setDate(tomorrowKey);
+  await vulcanPage.expectTaskNotVisible(todayTask);
 
   const tomorrowTask = `Tomorrow task ${Date.now()}`;
-  await vulcan.addTask(tomorrowTask, 5);
-  await vulcan.expectTaskVisible(tomorrowTask);
+  await vulcanPage.addTask(tomorrowTask, 5);
+  await vulcanPage.expectTaskVisible(tomorrowTask);
 
   await page.reload();
-  await vulcan.setDate(tomorrowKey);
-  await vulcan.expectTaskVisible(tomorrowTask);
-  await vulcan.expectTaskNotVisible(todayTask);
+  await vulcanPage.setDate(tomorrowKey);
+  await vulcanPage.expectTaskVisible(tomorrowTask);
+  await vulcanPage.expectTaskNotVisible(todayTask);
 
-  await vulcan.goToToday();
-  await vulcan.expectTaskVisible(todayTask);
-  await vulcan.expectTaskNotVisible(tomorrowTask);
+  await vulcanPage.goToToday();
+  await vulcanPage.expectTaskVisible(todayTask);
+  await vulcanPage.expectTaskNotVisible(tomorrowTask);
 });

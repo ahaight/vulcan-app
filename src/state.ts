@@ -15,7 +15,7 @@ export function addTodoItem(
     id: crypto.randomUUID(),
     title,
     points,
-    status: input.status ?? "not started",
+    status: input.status ?? "Not started",
     createdAt: new Date().toISOString(),
   };
 
@@ -63,6 +63,6 @@ export function deleteTodoItem(state: DailyTodos, itemId: string): DailyTodos {
 
 export function getDailyScore(state: DailyTodos): number {
   return state.items.reduce((total, item) => {
-    return item.status === "done" ? total + item.points : total;
+    return item.status === "Done" ? total + item.points : total;
   }, 0);
 }

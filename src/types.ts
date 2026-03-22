@@ -1,4 +1,4 @@
-export const TODO_STATUSES = ["not started", "in progress", "done"] as const;
+export const TODO_STATUSES = ["Not started", "In progress", "Done"] as const;
 
 export type TodoStatus = (typeof TODO_STATUSES)[number];
 

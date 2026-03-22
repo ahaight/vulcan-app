@@ -1,25 +1,12 @@
-import { test } from "@playwright/test";
-import { VulcanPage } from "./pages/vulcan-page";
+import { test } from "./fixtures";
 
-test.beforeEach(async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-  await vulcan.setupFreshState();
-});
-
-test.afterEach(async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-  await vulcan.cleanupData();
-});
-
-test("can add task and update score", async ({ page }) => {
-  const vulcan = new VulcanPage(page);
-
+test("can add task and update score", async ({ vulcanPage }) => {
   const uniqueTask = `Playwright task ${Date.now()}`;
-  await vulcan.addTask(uniqueTask, 7);
+  await vulcanPage.addTask(uniqueTask, 7);
 
-  await vulcan.expectTaskVisible(uniqueTask);
-  await vulcan.expectDailyScore(0);
+  await vulcanPage.expectTaskVisible(uniqueTask);
+  await vulcanPage.expectDailyScore(0);
 
-  await vulcan.setTaskStatus(uniqueTask, "done");
-  await vulcan.expectDailyScore(7);
+  await vulcanPage.setTaskStatus(uniqueTask, "Done");
+  await vulcanPage.expectDailyScore(7);
 });

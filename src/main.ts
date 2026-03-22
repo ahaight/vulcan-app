@@ -26,77 +26,80 @@ if (!app) {
 }
 
 app.innerHTML = `
-  <main class="container">
-    <header class="app-header">
-      <div>
-        <h1>Vulcan</h1>
+  <main class="app-shell">
+    <section class="card card--brand" aria-label="Branding and daily score">
+      <div class="brand-block">
+        <p class="brand-eyebrow">Daily to-do</p>
+        <h1 class="brand-name">Vulcan</h1>
         <p class="date-label" id="date-label"></p>
       </div>
       <section class="score-card" aria-label="Daily score">
         <p class="score-label">Daily Score</p>
         <p class="score-value" id="daily-score">0</p>
       </section>
-    </header>
-
-    <section class="toolbar" aria-label="Date and view controls">
-      <div class="date-controls">
-        <label class="field">
-          <span>Date</span>
-          <input id="date-picker" type="date" />
-        </label>
-        <button id="jump-today-button" type="button" class="secondary-button">Today</button>
-      </div>
-
-      <div class="view-controls">
-        <label class="field">
-          <span>Filter</span>
-          <select id="filter-select">
-            <option value="all">All</option>
-            ${TODO_STATUSES.map((status) => `<option value="${status}">${status}</option>`).join("")}
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Sort</span>
-          <select id="sort-select">
-            <option value="created-desc">Newest first</option>
-            <option value="created-asc">Oldest first</option>
-            <option value="points-desc">Points (high to low)</option>
-            <option value="status">Status</option>
-          </select>
-        </label>
-      </div>
     </section>
 
-    <section class="composer" aria-label="Create todo item">
-      <form id="todo-form" class="todo-form">
-        <label class="field">
-          <span>Task</span>
-          <input id="title-input" name="title" type="text" placeholder="Enter a task for today" maxlength="120" required />
-        </label>
-
-        <label class="field points-field">
-          <span>Points</span>
-          <input id="points-input" name="points" type="number" value="1" min="0" step="1" required />
-        </label>
-
-        <label class="field">
-          <span>Status</span>
-          <select id="new-status-select" class="status-select">
-            ${TODO_STATUSES.map(
-              (status) =>
-                `<option value="${status}" ${status === "not started" ? "selected" : ""}>${status}</option>`,
-            ).join("")}
-          </select>
-        </label>
-
-        <button type="submit" class="add-button">Add Task</button>
+    <section class="card card--controls" aria-label="Date, filters, and new task">
+      <form id="todo-form" class="controls-form">
+        <div class="controls-grid controls-grid--date">
+          <label class="field">
+            <span>Date</span>
+            <input id="date-picker" type="date" />
+          </label>
+          <div class="field field--today">
+            <span class="field-label-spacer" aria-hidden="true">Date</span>
+            <button id="jump-today-button" type="button" class="secondary-button secondary-button--today">Today</button>
+          </div>
+        </div>
+        <div class="controls-grid controls-grid--task-row">
+          <label class="field field--task">
+            <span>Task</span>
+            <input id="title-input" name="title" type="text" placeholder="Enter a task for today" maxlength="120" required />
+          </label>
+          <label class="field field--points">
+            <span>Points</span>
+            <input id="points-input" name="points" type="number" value="1" min="0" step="1" required />
+          </label>
+          <label class="field field--new-status">
+            <span>Status</span>
+            <select id="new-status-select" class="status-select app-select">
+              ${TODO_STATUSES.map(
+                (status) =>
+                  `<option value="${status}" ${status === "Not started" ? "selected" : ""}>${status}</option>`,
+              ).join("")}
+            </select>
+          </label>
+          <div class="field field--submit">
+            <span class="field-label-spacer" aria-hidden="true">Add</span>
+            <button type="submit" class="add-button">Add Task</button>
+          </div>
+        </div>
+        <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
       </form>
-      <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
     </section>
 
-    <section aria-label="Today's tasks">
-      <h2>Today's Tasks</h2>
+    <section class="card card--tasks" aria-label="Today's tasks">
+      <div class="tasks-header">
+        <h2 class="tasks-heading">Today's Tasks</h2>
+        <div class="tasks-toolbar" aria-label="Filter and sort tasks">
+          <label class="field">
+            <span>Filter</span>
+            <select id="filter-select" class="app-select">
+              <option value="all">All</option>
+              ${TODO_STATUSES.map((status) => `<option value="${status}">${status}</option>`).join("")}
+            </select>
+          </label>
+          <label class="field">
+            <span>Sort</span>
+            <select id="sort-select" class="app-select">
+              <option value="created-desc">Newest first</option>
+              <option value="created-asc">Oldest first</option>
+              <option value="points-desc">Points (high to low)</option>
+              <option value="status">Status</option>
+            </select>
+          </label>
+        </div>
+      </div>
       <ul id="todo-list" class="todo-list"></ul>
     </section>
   </main>
@@ -348,7 +351,7 @@ todoForm.addEventListener("submit", (event) => {
 
   todoForm.reset();
   pointsInput.value = "1";
-  newStatusSelect.value = "not started";
+  newStatusSelect.value = "Not started";
   titleInput.focus();
 });
 
