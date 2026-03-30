@@ -24,7 +24,8 @@ function parseHeadlessToggle(value: string | undefined): boolean | undefined {
 }
 
 const headlessOverride = parseHeadlessToggle(runtimeEnv?.PW_HEADLESS);
-const headless = headlessOverride ?? false;
+// CI runners have no display; default to headless there, headed locally.
+const headless = headlessOverride ?? isCI;
 
 export default defineConfig({
   testDir: "./tests/e2e",
