@@ -109,7 +109,7 @@ app.innerHTML = `
     </section>
 
     <section class="card card--controls" aria-label="Date, filters, and new task">
-      <form id="todo-form" class="controls-form">
+      <div class="controls-stack">
         <div class="controls-grid controls-grid--date">
           <label class="field">
             <span>Date</span>
@@ -120,6 +120,7 @@ app.innerHTML = `
             <button id="jump-today-button" type="button" class="secondary-button secondary-button--today">Today</button>
           </div>
         </div>
+        <form id="todo-form" class="controls-form">
         <div class="controls-grid controls-grid--task-row">
           <label class="field field--task">
             <span>Task</span>
@@ -160,12 +161,13 @@ app.innerHTML = `
           <div id="new-subtask-rows" class="new-subtask-rows" aria-label="New sub-tasks"></div>
         </div>
         <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
-      </form>
+        </form>
+      </div>
     </section>
 
-    <section class="card card--tasks" aria-label="Today's tasks">
+    <section id="tasks-section" class="card card--tasks" aria-label="Today's tasks">
       <div class="tasks-header">
-        <h2 class="tasks-heading">Today's Tasks</h2>
+        <h2 id="tasks-heading" class="tasks-heading">Today's Tasks</h2>
         <div class="tasks-toolbar" aria-label="Filter and sort tasks">
           <label class="field">
             <span>Status</span>
@@ -272,6 +274,8 @@ const priorityFilterSelect = document.querySelector<HTMLSelectElement>(
   "#priority-filter-select",
 )!;
 const sortSelect = document.querySelector<HTMLSelectElement>("#sort-select")!;
+const tasksSection = document.querySelector<HTMLElement>("#tasks-section")!;
+const tasksHeading = document.querySelector<HTMLHeadingElement>("#tasks-heading")!;
 const formError = document.querySelector<HTMLParagraphElement>("#form-error")!;
 const editModal = document.querySelector<HTMLDivElement>("#edit-modal")!;
 const editForm = document.querySelector<HTMLFormElement>("#edit-form")!;
@@ -425,9 +429,29 @@ function renderSubtasksBlock(item: TodoItem): string {
   `;
 }
 
+function applyDayFromPicker(): void {
+  const picked = datePicker.value;
+  if (!picked || picked === activeDateKey) {
+    return;
+  }
+  activeDateKey = picked;
+  dailyState = loadDailyTodos(activeDateKey);
+  expandedTaskIds.clear();
+  renderTodos();
+}
+
 function renderTodos(): void {
   dateLabel.textContent = formatDateLabel(activeDateKey);
   scoreValue.textContent = String(getDailyScore(dailyState));
+
+  const isViewingToday = activeDateKey === getTodayKey();
+  tasksHeading.textContent = isViewingToday
+    ? "Today's Tasks"
+    : `Tasks for ${formatDateLabel(activeDateKey)}`;
+  tasksSection.setAttribute(
+    "aria-label",
+    isViewingToday ? "Today's tasks" : `Tasks for ${formatDateLabel(activeDateKey)}`,
+  );
 
   const visibleItems = getVisibleItems();
   if (visibleItems.length === 0) {
@@ -658,6 +682,8 @@ todoForm.addEventListener("submit", (event) => {
     return;
   }
 
+  applyDayFromPicker();
+
   dailyState = addTodoItem(dailyState, {
     title,
     points: parsedPoints,
@@ -858,14 +884,11 @@ deleteConfirmButton.addEventListener("click", () => {
 });
 
 datePicker.addEventListener("change", () => {
-  if (!datePicker.value) {
-    return;
-  }
+  applyDayFromPicker();
+});
 
-  activeDateKey = datePicker.value;
-  dailyState = loadDailyTodos(activeDateKey);
-  expandedTaskIds.clear();
-  renderTodos();
+datePicker.addEventListener("input", () => {
+  applyDayFromPicker();
 });
 
 jumpTodayButton.addEventListener("click", () => {
