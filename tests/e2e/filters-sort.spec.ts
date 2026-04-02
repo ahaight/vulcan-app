@@ -26,7 +26,7 @@ test("filter shows only tasks matching selected status", async ({
   await vulcanPage.expectTodoItemCount(2);
 });
 
-test("sort by points shows highest points first", async ({ vulcanPage }) => {
+test("sort by effort shows quickest tasks first", async ({ vulcanPage }) => {
   const t = Date.now();
   const lowTitle = `Low pts ${t}`;
   const highTitle = `High pts ${t}`;
@@ -34,9 +34,9 @@ test("sort by points shows highest points first", async ({ vulcanPage }) => {
   await vulcanPage.addTask(lowTitle, "Quick", "Not started");
   await vulcanPage.addTask(highTitle, "Deep", "Not started");
 
-  await vulcanPage.setSort("points-desc");
+  await vulcanPage.setSort("effort-asc");
   const first = await vulcanPage.firstTodoTitle();
-  expect(first).toBe(highTitle);
+  expect(first).toBe(lowTitle);
 
   await vulcanPage.setSort("created-asc");
   const firstOldest = await vulcanPage.firstTodoTitle();

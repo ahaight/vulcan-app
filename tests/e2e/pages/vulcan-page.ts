@@ -241,7 +241,7 @@ export class VulcanPage {
       | "manual"
       | "created-desc"
       | "created-asc"
-      | "points-desc"
+      | "effort-asc"
       | "status",
   ): Promise<void> {
     await this.sortSelect.selectOption(value);

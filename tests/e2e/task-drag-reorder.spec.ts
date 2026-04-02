@@ -63,7 +63,7 @@ test("drag handles are disabled when sort is not custom order", async ({
 }) => {
   const title = `No drag ${Date.now()}`;
   await vulcanPage.addTask(title, "Quick");
-  await vulcanPage.setSort("points-desc");
+  await vulcanPage.setSort("effort-asc");
   await expect(
     vulcanPage.todoItemByTitle(title).locator(".drag-handle[draggable='true']"),
   ).toHaveCount(0);
