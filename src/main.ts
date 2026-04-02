@@ -82,7 +82,7 @@ let sortMode:
   | "manual"
   | "created-desc"
   | "created-asc"
-  | "points-desc"
+  | "effort-asc"
   | "status" = "manual";
 let editingItemId: string | null = null;
 let deletingItemId: string | null = null;
@@ -224,7 +224,7 @@ app.innerHTML = `
               <option value="manual" selected>Custom order</option>
               <option value="created-desc">Newest first</option>
               <option value="created-asc">Oldest first</option>
-              <option value="points-desc">Points (high to low)</option>
+              <option value="effort-asc">Effort (Quick to Deep)</option>
               <option value="status">Status</option>
             </select>
           </label>
@@ -398,8 +398,8 @@ function compareBySort(left: TodoItem, right: TodoItem): number {
   if (sortMode === "created-asc") {
     return left.createdAt.localeCompare(right.createdAt);
   }
-  if (sortMode === "points-desc") {
-    return pointsForEffort(right.effort) - pointsForEffort(left.effort);
+  if (sortMode === "effort-asc") {
+    return pointsForEffort(left.effort) - pointsForEffort(right.effort);
   }
   if (sortMode === "status") {
     return left.status.localeCompare(right.status);
@@ -971,7 +971,7 @@ sortSelect.addEventListener("change", () => {
     selected === "manual" ||
     selected === "created-desc" ||
     selected === "created-asc" ||
-    selected === "points-desc" ||
+    selected === "effort-asc" ||
     selected === "status"
   ) {
     sortMode = selected;
