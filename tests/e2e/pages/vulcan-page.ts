@@ -11,10 +11,12 @@ export type TodoCategory =
 
 export type TodoPriority = "High" | "Medium" | "Low";
 
+export type TodoEffort = "Quick" | "Medium" | "Deep";
+
 export class VulcanPage {
   readonly page: Page;
   readonly titleInput: Locator;
-  readonly pointsInput: Locator;
+  readonly effortSelect: Locator;
   readonly newCategorySelect: Locator;
   readonly newPrioritySelect: Locator;
   readonly addNewSubtaskRowButton: Locator;
@@ -29,7 +31,7 @@ export class VulcanPage {
   readonly sortSelect: Locator;
   readonly editModal: Locator;
   readonly editTitleInput: Locator;
-  readonly editPointsInput: Locator;
+  readonly editEffortSelect: Locator;
   readonly editCategorySelect: Locator;
   readonly editPrioritySelect: Locator;
   readonly editStatusSelect: Locator;
@@ -46,7 +48,7 @@ export class VulcanPage {
   constructor(page: Page) {
     this.page = page;
     this.titleInput = page.locator("#title-input");
-    this.pointsInput = page.locator("#points-input");
+    this.effortSelect = page.locator("#effort-select");
     this.newCategorySelect = page.locator("#new-category-select");
     this.newPrioritySelect = page.locator("#new-priority-select");
     this.addNewSubtaskRowButton = page.locator("#add-new-subtask-row");
@@ -61,7 +63,7 @@ export class VulcanPage {
     this.sortSelect = page.locator("#sort-select");
     this.editModal = page.locator("#edit-modal");
     this.editTitleInput = page.locator("#edit-title-input");
-    this.editPointsInput = page.locator("#edit-points-input");
+    this.editEffortSelect = page.locator("#edit-effort-select");
     this.editCategorySelect = page.locator("#edit-category-select");
     this.editPrioritySelect = page.locator("#edit-priority-select");
     this.editStatusSelect = page.locator("#edit-status-select");
@@ -102,7 +104,7 @@ export class VulcanPage {
 
   async addTask(
     title: string,
-    points: number,
+    effort: TodoEffort,
     status: "Not started" | "In progress" | "Done" = "Not started",
     options?: {
       category?: TodoCategory;
@@ -111,7 +113,7 @@ export class VulcanPage {
     },
   ): Promise<void> {
     await this.titleInput.fill(title);
-    await this.pointsInput.fill(String(points));
+    await this.effortSelect.selectOption(effort);
     if (options?.category) {
       await this.newCategorySelect.selectOption(options.category);
     }
@@ -158,7 +160,7 @@ export class VulcanPage {
 
   async saveEditTask(input: {
     title?: string;
-    points?: number;
+    effort?: TodoEffort;
     category?: TodoCategory;
     priority?: TodoPriority;
     status?: "Not started" | "In progress" | "Done";
@@ -166,8 +168,8 @@ export class VulcanPage {
     if (input.title !== undefined) {
       await this.editTitleInput.fill(input.title);
     }
-    if (input.points !== undefined) {
-      await this.editPointsInput.fill(String(input.points));
+    if (input.effort !== undefined) {
+      await this.editEffortSelect.selectOption(input.effort);
     }
     if (input.category !== undefined) {
       await this.editCategorySelect.selectOption(input.category);
@@ -321,16 +323,4 @@ export class VulcanPage {
     return this.subtaskRowByText(taskTitle, subtaskText).locator(".subtask-drag-handle");
   }
 
-  /** Sets points input value directly (for testing app validation; avoids browser number clamp). */
-  async setPointsInputValueRaw(value: string): Promise<void> {
-    await this.pointsInput.evaluate((el, v) => {
-      (el as HTMLInputElement).value = v;
-    }, value);
-  }
-
-  async setEditPointsInputValueRaw(value: string): Promise<void> {
-    await this.editPointsInput.evaluate((el, v) => {
-      (el as HTMLInputElement).value = v;
-    }, value);
-  }
 }

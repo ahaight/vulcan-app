@@ -7,8 +7,8 @@ test("filter shows only tasks matching selected status", async ({
   const notStartedTitle = `Filter NS ${t}`;
   const doneTitle = `Filter Done ${t}`;
 
-  await vulcanPage.addTask(notStartedTitle, 1, "Not started");
-  await vulcanPage.addTask(doneTitle, 2, "Done");
+  await vulcanPage.addTask(notStartedTitle, "Quick", "Not started");
+  await vulcanPage.addTask(doneTitle, "Medium", "Done");
 
   await vulcanPage.setFilter("Done");
   await vulcanPage.expectTaskNotVisible(notStartedTitle);
@@ -31,8 +31,8 @@ test("sort by points shows highest points first", async ({ vulcanPage }) => {
   const lowTitle = `Low pts ${t}`;
   const highTitle = `High pts ${t}`;
 
-  await vulcanPage.addTask(lowTitle, 2, "Not started");
-  await vulcanPage.addTask(highTitle, 10, "Not started");
+  await vulcanPage.addTask(lowTitle, "Quick", "Not started");
+  await vulcanPage.addTask(highTitle, "Deep", "Not started");
 
   await vulcanPage.setSort("points-desc");
   const first = await vulcanPage.firstTodoTitle();

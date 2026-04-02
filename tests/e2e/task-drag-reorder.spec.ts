@@ -8,8 +8,8 @@ test("reorders tasks with drag and drop in custom order sort", async ({
   const secondTitle = `Drag B ${t}`;
 
   await vulcanPage.setSort("manual");
-  await vulcanPage.addTask(firstTitle, 1);
-  await vulcanPage.addTask(secondTitle, 1);
+  await vulcanPage.addTask(firstTitle, "Quick");
+  await vulcanPage.addTask(secondTitle, "Quick");
 
   await expect(vulcanPage.todoItems.nth(0).locator(".todo-title")).toHaveText(
     firstTitle,
@@ -49,8 +49,8 @@ test("dragging the first task onto the second moves it below (swap two tasks)", 
   const bottomTitle = `Bottom ${t}`;
 
   await vulcanPage.setSort("manual");
-  await vulcanPage.addTask(topTitle, 1);
-  await vulcanPage.addTask(bottomTitle, 1);
+  await vulcanPage.addTask(topTitle, "Quick");
+  await vulcanPage.addTask(bottomTitle, "Quick");
 
   await vulcanPage.taskDragHandle(topTitle).dragTo(vulcanPage.todoItemByTitle(bottomTitle));
 
@@ -62,7 +62,7 @@ test("drag handles are disabled when sort is not custom order", async ({
   vulcanPage,
 }) => {
   const title = `No drag ${Date.now()}`;
-  await vulcanPage.addTask(title, 1);
+  await vulcanPage.addTask(title, "Quick");
   await vulcanPage.setSort("points-desc");
   await expect(
     vulcanPage.todoItemByTitle(title).locator(".drag-handle[draggable='true']"),

@@ -5,8 +5,8 @@ test("category filter shows only matching tasks", async ({ vulcanPage }) => {
   const workTitle = `Cat work ${t}`;
   const personalTitle = `Cat personal ${t}`;
 
-  await vulcanPage.addTask(workTitle, 1, "Not started", { category: "Work" });
-  await vulcanPage.addTask(personalTitle, 1, "Not started", {
+  await vulcanPage.addTask(workTitle, "Quick", "Not started", { category: "Work" });
+  await vulcanPage.addTask(personalTitle, "Quick", "Not started", {
     category: "Personal",
   });
 
@@ -28,8 +28,8 @@ test("priority filter shows only matching tasks", async ({ vulcanPage }) => {
   const highTitle = `Pri high ${t}`;
   const lowTitle = `Pri low ${t}`;
 
-  await vulcanPage.addTask(highTitle, 1, "Not started", { priority: "High" });
-  await vulcanPage.addTask(lowTitle, 1, "Not started", { priority: "Low" });
+  await vulcanPage.addTask(highTitle, "Quick", "Not started", { priority: "High" });
+  await vulcanPage.addTask(lowTitle, "Quick", "Not started", { priority: "Low" });
 
   await vulcanPage.setPriorityFilter("High");
   await vulcanPage.expectTaskVisible(highTitle);
@@ -46,7 +46,7 @@ test("priority filter shows only matching tasks", async ({ vulcanPage }) => {
 
 test("edit modal updates category and priority", async ({ vulcanPage }) => {
   const title = `Edit cat pri ${Date.now()}`;
-  await vulcanPage.addTask(title, 2, "Not started", {
+  await vulcanPage.addTask(title, "Quick", "Not started", {
     category: "Other",
     priority: "Medium",
   });
@@ -71,19 +71,19 @@ test("combined status, category, and priority filters", async ({
   const wrongPri = `Wrong pri ${t}`;
   const wrongStat = `Wrong stat ${t}`;
 
-  await vulcanPage.addTask(match, 1, "Not started", {
+  await vulcanPage.addTask(match, "Quick", "Not started", {
     category: "Work",
     priority: "High",
   });
-  await vulcanPage.addTask(wrongCat, 1, "Not started", {
+  await vulcanPage.addTask(wrongCat, "Quick", "Not started", {
     category: "Personal",
     priority: "High",
   });
-  await vulcanPage.addTask(wrongPri, 1, "Not started", {
+  await vulcanPage.addTask(wrongPri, "Quick", "Not started", {
     category: "Work",
     priority: "Low",
   });
-  await vulcanPage.addTask(wrongStat, 1, "Done", {
+  await vulcanPage.addTask(wrongStat, "Quick", "Done", {
     category: "Work",
     priority: "High",
   });
@@ -103,7 +103,7 @@ test("new task form includes category and priority in meta line", async ({
   vulcanPage,
 }) => {
   const title = `Meta line ${Date.now()}`;
-  await vulcanPage.addTask(title, 3, "Not started", {
+  await vulcanPage.addTask(title, "Medium", "Not started", {
     category: "Health",
     priority: "Low",
   });

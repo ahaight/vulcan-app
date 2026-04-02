@@ -308,7 +308,7 @@ h2,
 .controls-grid--task-row {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: minmax(0, 1fr) minmax(72px, 88px) minmax(110px, 130px) minmax(
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 130px) minmax(110px, 130px) minmax(
       100px,
       120px
     ) auto;
@@ -341,6 +341,74 @@ h2,
   line-height: 1.2;
   min-height: 1.2em;
   user-select: none;
+}
+
+.field-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.field-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.field-tooltip__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border: 1px solid var(--input-border);
+  border-radius: 999px;
+  background: var(--input-bg);
+  color: var(--app-text-soft);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+}
+
+.field-tooltip__trigger:hover,
+.field-tooltip__trigger:focus-visible {
+  border-color: var(--input-focus-border);
+  color: var(--input-focus-border);
+  outline: none;
+}
+
+.field-tooltip__trigger:focus-visible {
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+.field-tooltip__popup {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  bottom: calc(100% + 6px);
+  width: min(280px, 70vw);
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--app-text);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  box-shadow: var(--card-shadow);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.field-tooltip:hover .field-tooltip__popup,
+.field-tooltip:focus-within .field-tooltip__popup {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .secondary-button--compact {

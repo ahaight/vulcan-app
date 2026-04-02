@@ -5,7 +5,7 @@ test("keeps tasks isolated by date and persists on reload", async ({
   page,
 }) => {
   const todayTask = `Today task ${Date.now()}`;
-  await vulcanPage.addTask(todayTask, 3);
+  await vulcanPage.addTask(todayTask, "Medium");
   await vulcanPage.expectTaskVisible(todayTask);
 
   const tomorrow = new Date();
@@ -16,7 +16,7 @@ test("keeps tasks isolated by date and persists on reload", async ({
   await vulcanPage.expectTaskNotVisible(todayTask);
 
   const tomorrowTask = `Tomorrow task ${Date.now()}`;
-  await vulcanPage.addTask(tomorrowTask, 5);
+  await vulcanPage.addTask(tomorrowTask, "Quick");
   await vulcanPage.expectTaskVisible(tomorrowTask);
 
   await page.reload();

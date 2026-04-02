@@ -18,6 +18,20 @@ export const TODO_PRIORITIES = ["High", "Medium", "Low"] as const;
 
 export type TodoPriority = (typeof TODO_PRIORITIES)[number];
 
+export const TODO_EFFORTS = ["Quick", "Medium", "Deep"] as const;
+
+export type TodoEffort = (typeof TODO_EFFORTS)[number];
+
+export const EFFORT_POINTS: Record<TodoEffort, number> = {
+  Quick: 5,
+  Medium: 15,
+  Deep: 30,
+};
+
+export function pointsForEffort(effort: TodoEffort): number {
+  return EFFORT_POINTS[effort];
+}
+
 export interface SubTask {
   id: string;
   title: string;
@@ -26,7 +40,7 @@ export interface SubTask {
 export interface TodoItem {
   id: string;
   title: string;
-  points: number;
+  effort: TodoEffort;
   status: TodoStatus;
   createdAt: string;
   category: TodoCategory;
@@ -49,4 +63,8 @@ export function isTodoCategory(value: string): value is TodoCategory {
 
 export function isTodoPriority(value: string): value is TodoPriority {
   return TODO_PRIORITIES.includes(value as TodoPriority);
+}
+
+export function isTodoEffort(value: string): value is TodoEffort {
+  return TODO_EFFORTS.includes(value as TodoEffort);
 }

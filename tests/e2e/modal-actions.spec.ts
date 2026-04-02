@@ -2,7 +2,7 @@ import { test } from "./fixtures";
 
 test("edit modal supports cancel and save", async ({ vulcanPage }) => {
   const originalTitle = `Original task ${Date.now()}`;
-  await vulcanPage.addTask(originalTitle, 3);
+  await vulcanPage.addTask(originalTitle, "Quick");
   await vulcanPage.expectTaskVisible(originalTitle);
 
   await vulcanPage.clickEditTask(originalTitle);
@@ -14,18 +14,18 @@ test("edit modal supports cancel and save", async ({ vulcanPage }) => {
   await vulcanPage.clickEditTask(originalTitle);
   await vulcanPage.expectEditModalVisible();
   const updatedTitle = `Updated task ${Date.now()}`;
-  await vulcanPage.saveEditTask({ title: updatedTitle, points: 9 });
+  await vulcanPage.saveEditTask({ title: updatedTitle, effort: "Deep" });
 
   await vulcanPage.expectTaskVisible(updatedTitle);
   await vulcanPage.setTaskStatus(updatedTitle, "Done");
-  await vulcanPage.expectDailyScore(9);
+  await vulcanPage.expectDailyScore(30);
 });
 
 test("delete confirmation supports cancel and confirm", async ({
   vulcanPage,
 }) => {
   const deleteTarget = `Delete target ${Date.now()}`;
-  await vulcanPage.addTask(deleteTarget, 4);
+  await vulcanPage.addTask(deleteTarget, "Quick");
   await vulcanPage.expectTaskVisible(deleteTarget);
 
   await vulcanPage.clickDeleteTask(deleteTarget);

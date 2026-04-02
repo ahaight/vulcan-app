@@ -4,7 +4,7 @@ test("creates task with optional sub-tasks from the form", async ({
   vulcanPage,
 }) => {
   const title = `Parent ST ${Date.now()}`;
-  await vulcanPage.addTask(title, 1, "Not started", {
+  await vulcanPage.addTask(title, "Quick", "Not started", {
     subtaskTitles: ["Step one", "Step two"],
   });
 
@@ -20,7 +20,7 @@ test("creates task with optional sub-tasks from the form", async ({
 
 test("sub-tasks section starts collapsed", async ({ vulcanPage }) => {
   const title = `Collapsed ${Date.now()}`;
-  await vulcanPage.addTask(title, 1);
+  await vulcanPage.addTask(title, "Quick");
   await vulcanPage.expectSubtasksPanelHidden(title);
 });
 
@@ -28,7 +28,7 @@ test("adds, edits, and deletes sub-tasks on an existing task", async ({
   vulcanPage,
 }) => {
   const title = `Sub CRUD ${Date.now()}`;
-  await vulcanPage.addTask(title, 1);
+  await vulcanPage.addTask(title, "Quick");
 
   await vulcanPage.expandSubtasks(title);
   const panel = vulcanPage.subtasksPanelForTask(title);
@@ -65,7 +65,7 @@ test("adds, edits, and deletes sub-tasks on an existing task", async ({
 
 test("reorders sub-tasks with drag and drop", async ({ vulcanPage }) => {
   const title = `Sub reorder ${Date.now()}`;
-  await vulcanPage.addTask(title, 1, "Not started", {
+  await vulcanPage.addTask(title, "Quick", "Not started", {
     subtaskTitles: ["Alpha", "Beta"],
   });
 
@@ -88,7 +88,7 @@ test("reorders sub-tasks with drag and drop", async ({ vulcanPage }) => {
 
 test("toggle collapses and expands sub-tasks", async ({ vulcanPage }) => {
   const title = `Toggle ${Date.now()}`;
-  await vulcanPage.addTask(title, 1, "Not started", {
+  await vulcanPage.addTask(title, "Quick", "Not started", {
     subtaskTitles: ["Only one"],
   });
 

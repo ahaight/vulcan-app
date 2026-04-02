@@ -1,10 +1,12 @@
-import type {
-  DailyTodos,
-  SubTask,
-  TodoCategory,
-  TodoItem,
-  TodoPriority,
-  TodoStatus,
+import {
+  pointsForEffort,
+  type DailyTodos,
+  type SubTask,
+  type TodoCategory,
+  type TodoEffort,
+  type TodoItem,
+  type TodoPriority,
+  type TodoStatus,
 } from "./types";
 
 export function createEmptyDay(date: string): DailyTodos {
@@ -15,7 +17,7 @@ export function addTodoItem(
   state: DailyTodos,
   input: {
     title: string;
-    points: number;
+    effort: TodoEffort;
     status?: TodoStatus;
     category?: TodoCategory;
     priority?: TodoPriority;
@@ -23,7 +25,6 @@ export function addTodoItem(
   },
 ): DailyTodos {
   const title = input.title.trim();
-  const points = Number.isFinite(input.points) ? Math.max(0, input.points) : 0;
 
   const subtasks: SubTask[] = (input.subtaskTitles ?? [])
     .map((st) => st.trim())
@@ -36,7 +37,7 @@ export function addTodoItem(
   const newItem: TodoItem = {
     id: crypto.randomUUID(),
     title,
-    points,
+    effort: input.effort,
     status: input.status ?? "Not started",
     createdAt: new Date().toISOString(),
     category: input.category ?? "Other",
@@ -68,14 +69,13 @@ export function updateTodoItem(
   itemId: string,
   input: {
     title: string;
-    points: number;
+    effort: TodoEffort;
     category?: TodoCategory;
     priority?: TodoPriority;
     status?: TodoStatus;
   },
 ): DailyTodos {
   const title = input.title.trim();
-  const points = Number.isFinite(input.points) ? Math.max(0, input.points) : 0;
 
   return {
     ...state,
@@ -84,7 +84,7 @@ export function updateTodoItem(
         ? {
             ...item,
             title,
-            points,
+            effort: input.effort,
             ...(input.category !== undefined ? { category: input.category } : {}),
             ...(input.priority !== undefined ? { priority: input.priority } : {}),
             ...(input.status !== undefined ? { status: input.status } : {}),
@@ -103,7 +103,7 @@ export function deleteTodoItem(state: DailyTodos, itemId: string): DailyTodos {
 
 export function getDailyScore(state: DailyTodos): number {
   return state.items.reduce((total, item) => {
-    return item.status === "Done" ? total + item.points : total;
+    return item.status === "Done" ? total + pointsForEffort(item.effort) : total;
   }, 0);
 }
 

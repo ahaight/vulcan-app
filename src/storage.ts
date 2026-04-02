@@ -1,6 +1,7 @@
-import type { DailyTodos, SubTask, TodoItem } from "./types";
+import type { DailyTodos, SubTask, TodoEffort, TodoItem } from "./types";
 import {
   isTodoCategory,
+  isTodoEffort,
   isTodoPriority,
   isTodoStatus,
   TODO_CATEGORIES,
@@ -37,6 +38,20 @@ function sanitizeSubtasks(raw: unknown): SubTask[] {
     .filter((st): st is SubTask => st !== null);
 }
 
+function effortFromLegacyPoints(points: number): TodoEffort {
+  const p = Math.floor(points);
+  if (p === 5) {
+    return "Quick";
+  }
+  if (p === 15) {
+    return "Medium";
+  }
+  if (p === 30) {
+    return "Deep";
+  }
+  return "Medium";
+}
+
 function sanitizeItems(items: unknown): TodoItem[] {
   if (!Array.isArray(items)) {
     return [];
@@ -48,13 +63,12 @@ function sanitizeItems(items: unknown): TodoItem[] {
         return null;
       }
 
-      const candidate = item as Partial<TodoItem>;
+      const candidate = item as Partial<TodoItem> & { points?: number };
       const statusCandidate = candidate.status;
       if (
         typeof candidate.id !== "string" ||
         typeof candidate.title !== "string" ||
         typeof candidate.createdAt !== "string" ||
-        typeof candidate.points !== "number" ||
         typeof statusCandidate !== "string" ||
         !isTodoStatus(statusCandidate)
       ) {
@@ -71,11 +85,20 @@ function sanitizeItems(items: unknown): TodoItem[] {
           ? candidate.priority
           : TODO_PRIORITIES[1];
 
+      let effort: TodoEffort;
+      if (typeof candidate.effort === "string" && isTodoEffort(candidate.effort)) {
+        effort = candidate.effort;
+      } else if (typeof candidate.points === "number") {
+        effort = effortFromLegacyPoints(candidate.points);
+      } else {
+        effort = "Medium";
+      }
+
       return {
         id: candidate.id,
         title: candidate.title,
         createdAt: candidate.createdAt,
-        points: Math.max(0, Math.floor(candidate.points)),
+        effort,
         status: statusCandidate,
         category: categoryRaw,
         priority: priorityRaw,

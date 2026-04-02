@@ -14,13 +14,24 @@ import {
 import { loadDailyTodos, saveDailyTodos } from "./storage";
 import {
   isTodoCategory,
+  isTodoEffort,
   isTodoPriority,
   isTodoStatus,
   TODO_CATEGORIES,
+  TODO_EFFORTS,
   TODO_PRIORITIES,
   TODO_STATUSES,
+  pointsForEffort,
   type TodoItem,
 } from "./types";
+
+const EFFORT_TOOLTIP_TEXT =
+  "Quick tasks generally take about 15 minutes, Medium tasks take about 30-60 minutes and Deep tasks take about 1-2 hours.";
+
+function formatPointsMeta(item: TodoItem): string {
+  const pts = pointsForEffort(item.effort);
+  return `${pts} point${pts === 1 ? "" : "s"}`;
+}
 
 const THEME_STORAGE_KEY = "vulcan.theme";
 
@@ -126,9 +137,26 @@ app.innerHTML = `
             <span>Task</span>
             <input id="title-input" name="title" type="text" placeholder="Enter a task for today" maxlength="120" required />
           </label>
-          <label class="field field--points">
-            <span>Points</span>
-            <input id="points-input" name="points" type="number" value="1" min="0" step="1" required />
+          <label class="field field--effort">
+            <span class="field-label-row">
+              <span id="new-effort-label">Effort</span>
+              <span class="field-tooltip">
+                <button
+                  type="button"
+                  class="field-tooltip__trigger"
+                  aria-label="${escapeHtml(EFFORT_TOOLTIP_TEXT)}"
+                >
+                  ?
+                </button>
+                <span class="field-tooltip__popup" role="tooltip" aria-hidden="true">${escapeHtml(EFFORT_TOOLTIP_TEXT)}</span>
+              </span>
+            </span>
+            <select id="effort-select" name="effort" class="app-select" aria-labelledby="new-effort-label">
+              ${TODO_EFFORTS.map(
+                (e) =>
+                  `<option value="${e}" ${e === "Medium" ? "selected" : ""}>${e}</option>`,
+              ).join("")}
+            </select>
           </label>
           <label class="field field--category">
             <span>Category</span>
@@ -214,9 +242,23 @@ app.innerHTML = `
           <span>Task</span>
           <input id="edit-title-input" name="edit-title" type="text" maxlength="120" required />
         </label>
-        <label class="field">
-          <span>Points</span>
-          <input id="edit-points-input" name="edit-points" type="number" min="0" step="1" required />
+        <label class="field field--effort">
+          <span class="field-label-row">
+            <span id="edit-effort-label">Effort</span>
+            <span class="field-tooltip">
+              <button
+                type="button"
+                class="field-tooltip__trigger"
+                aria-label="${escapeHtml(EFFORT_TOOLTIP_TEXT)}"
+              >
+                ?
+              </button>
+              <span class="field-tooltip__popup" role="tooltip" aria-hidden="true">${escapeHtml(EFFORT_TOOLTIP_TEXT)}</span>
+            </span>
+          </span>
+          <select id="edit-effort-select" name="edit-effort" class="app-select" aria-labelledby="edit-effort-label">
+            ${TODO_EFFORTS.map((e) => `<option value="${e}">${e}</option>`).join("")}
+          </select>
         </label>
         <label class="field">
           <span>Category</span>
@@ -256,7 +298,7 @@ const scoreValue = document.querySelector<HTMLParagraphElement>("#daily-score")!
 const todoList = document.querySelector<HTMLUListElement>("#todo-list")!;
 const todoForm = document.querySelector<HTMLFormElement>("#todo-form")!;
 const titleInput = document.querySelector<HTMLInputElement>("#title-input")!;
-const pointsInput = document.querySelector<HTMLInputElement>("#points-input")!;
+const effortSelect = document.querySelector<HTMLSelectElement>("#effort-select")!;
 const themeToggleButton = document.querySelector<HTMLButtonElement>("#theme-toggle")!;
 const newCategorySelect = document.querySelector<HTMLSelectElement>("#new-category-select")!;
 const newPrioritySelect = document.querySelector<HTMLSelectElement>("#new-priority-select")!;
@@ -280,7 +322,7 @@ const formError = document.querySelector<HTMLParagraphElement>("#form-error")!;
 const editModal = document.querySelector<HTMLDivElement>("#edit-modal")!;
 const editForm = document.querySelector<HTMLFormElement>("#edit-form")!;
 const editTitleInput = document.querySelector<HTMLInputElement>("#edit-title-input")!;
-const editPointsInput = document.querySelector<HTMLInputElement>("#edit-points-input")!;
+const editEffortSelect = document.querySelector<HTMLSelectElement>("#edit-effort-select")!;
 const editCategorySelect = document.querySelector<HTMLSelectElement>("#edit-category-select")!;
 const editPrioritySelect = document.querySelector<HTMLSelectElement>("#edit-priority-select")!;
 const editStatusSelect = document.querySelector<HTMLSelectElement>("#edit-status-select")!;
@@ -357,7 +399,7 @@ function compareBySort(left: TodoItem, right: TodoItem): number {
     return left.createdAt.localeCompare(right.createdAt);
   }
   if (sortMode === "points-desc") {
-    return right.points - left.points;
+    return pointsForEffort(right.effort) - pointsForEffort(left.effort);
   }
   if (sortMode === "status") {
     return left.status.localeCompare(right.status);
@@ -474,7 +516,7 @@ function renderTodos(): void {
         <div class="todo-body">
           <div class="todo-main">
             <p class="todo-title">${escapeHtml(item.title)}</p>
-            <p class="todo-meta">${item.points} point${item.points === 1 ? "" : "s"} · ${escapeHtml(item.category)} · ${escapeHtml(item.priority)} · ${escapeHtml(item.status)}</p>
+            <p class="todo-meta">${formatPointsMeta(item)} · ${escapeHtml(item.category)} · ${escapeHtml(item.priority)} · ${escapeHtml(item.status)}</p>
           </div>
           ${renderSubtasksBlock(item)}
         </div>
@@ -624,7 +666,7 @@ function openEditModal(item: TodoItem): void {
   editingItemId = item.id;
   editError.textContent = "";
   editTitleInput.value = item.title;
-  editPointsInput.value = String(item.points);
+  editEffortSelect.value = item.effort;
   editCategorySelect.value = item.category;
   editPrioritySelect.value = item.priority;
   editStatusSelect.value = item.status;
@@ -660,7 +702,7 @@ todoForm.addEventListener("submit", (event) => {
   formError.textContent = "";
 
   const title = titleInput.value.trim();
-  const parsedPoints = Number.parseInt(pointsInput.value, 10);
+  const selectedEffort = effortSelect.value;
   const selectedCategory = newCategorySelect.value;
   const selectedPriority = newPrioritySelect.value;
 
@@ -669,8 +711,8 @@ todoForm.addEventListener("submit", (event) => {
     return;
   }
 
-  if (Number.isNaN(parsedPoints) || parsedPoints < 0) {
-    formError.textContent = "Points must be zero or greater.";
+  if (!isTodoEffort(selectedEffort)) {
+    formError.textContent = "Please choose a valid effort.";
     return;
   }
   if (!isTodoCategory(selectedCategory)) {
@@ -686,7 +728,7 @@ todoForm.addEventListener("submit", (event) => {
 
   dailyState = addTodoItem(dailyState, {
     title,
-    points: parsedPoints,
+    effort: selectedEffort,
     category: selectedCategory,
     priority: selectedPriority,
     subtaskTitles: collectNewSubtaskTitles(),
@@ -695,7 +737,7 @@ todoForm.addEventListener("submit", (event) => {
   renderTodos();
 
   todoForm.reset();
-  pointsInput.value = "1";
+  effortSelect.value = "Medium";
   newCategorySelect.value = "Other";
   newPrioritySelect.value = "Medium";
   clearNewSubtaskRows();
@@ -825,7 +867,7 @@ editForm.addEventListener("submit", (event) => {
   }
 
   const updatedTitle = editTitleInput.value.trim();
-  const updatedPoints = Number.parseInt(editPointsInput.value, 10);
+  const updatedEffort = editEffortSelect.value;
   const cat = editCategorySelect.value;
   const pri = editPrioritySelect.value;
   const st = editStatusSelect.value;
@@ -833,8 +875,8 @@ editForm.addEventListener("submit", (event) => {
     editError.textContent = "Task title is required.";
     return;
   }
-  if (Number.isNaN(updatedPoints) || updatedPoints < 0) {
-    editError.textContent = "Points must be zero or greater.";
+  if (!isTodoEffort(updatedEffort)) {
+    editError.textContent = "Please choose a valid effort.";
     return;
   }
   if (!isTodoCategory(cat)) {
@@ -852,7 +894,7 @@ editForm.addEventListener("submit", (event) => {
 
   dailyState = updateTodoItem(dailyState, editingItemId, {
     title: updatedTitle,
-    points: updatedPoints,
+    effort: updatedEffort,
     category: cat,
     priority: pri,
     status: st,
