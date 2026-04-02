@@ -39,6 +39,8 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_BASE_PATH: /vulcan-app/
         run: npm run build
 
       - name: Upload artifact
