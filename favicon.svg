@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vulcan favicon">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#312e81" />
+      <stop offset="0.52" stop-color="#4f46e5" />
+      <stop offset="1" stop-color="#9333ea" />
+    </linearGradient>
+    <linearGradient id="stroke" x1="19" y1="16" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e0e7ff" />
+      <stop offset="1" stop-color="#ffffff" />
+    </linearGradient>
+  </defs>
+
+  <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#bg)" />
+  <path d="M20 18L31.8 47L44 18" fill="none" stroke="url(#stroke)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M43.5 12.5L45 15.6L48.2 17.1L45 18.6L43.5 21.7L42 18.6L38.8 17.1L42 15.6Z" fill="#c4b5fd" />
+</svg>
